@@ -1,0 +1,56 @@
+{
+  "NAME": "LIVE12_4_SIGNAL",
+  "MIN_24H_VOLUME": 40000000,
+  "LOOKBACK_CANDLES": 500,
+  "VOLUME_LOOKBACK": 10,
+  "VOL_MULT": 2.0,
+  "MIN_BODY_PCT": 10.0,
+  "COOLDOWN_BARS": 0,
+  "EMA_FAST": 20,
+  "EMA_SLOW": 200,
+  "ATR_LEN": 50,
+  "BTC_LOOKBACK": 50,
+  "USE_EMA_FILTER": true,
+  "USE_VWAP_FILTER": false,
+  "USE_CORREL_FILTER": false,
+  "CORREL_MIN_BUY": 0,
+  "CORREL_MAX_BUY": 0,
+  "CORREL_MIN_SELL": 0,
+  "CORREL_MAX_SELL": 0,
+  "SKIP_DAYS": [],
+  "STRATEGIES_CONFIG": {
+    "12:4": {
+      "enabled": true,
+      "tp": 0.12,
+      "sl": 0.04,
+      "BUY": {
+        "USE_NATR_FILTER": true,
+        "NATR_MIN": 1,
+        "NATR_MAX": 7,
+        "USE_DELTA_FILTER": true,
+        "DELTA_MIN": -100,
+        "DELTA_MAX": 90,
+        "USE_CORREL_FILTER": true,
+        "CORREL_MIN": -100,
+        "CORREL_MAX": 0.9,
+        "SKIP_DAYS": []
+      },
+      "SELL": {
+        "USE_NATR_FILTER": true,
+        "NATR_MIN": 1.5,
+        "NATR_MAX": 7,
+        "USE_DELTA_FILTER": true,
+        "DELTA_MIN": -100,
+        "DELTA_MAX": 100,
+        "USE_CORREL_FILTER": true,
+        "CORREL_MIN": -100,
+        "CORREL_MAX": 0.9,
+        "SKIP_DAYS": [
+          "monday",
+          "tuesday",
+          "wednesday"
+        ]
+      }
+    }
+  }
+}

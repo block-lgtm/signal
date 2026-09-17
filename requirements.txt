@@ -1,0 +1,7 @@
+python-binance
+pandas
+requests
+matplotlib
+python-dotenv
+fastapi
+uvicorn
