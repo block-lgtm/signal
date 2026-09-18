@@ -26,10 +26,10 @@
       "BUY": {
         "USE_NATR_FILTER": true,
         "NATR_MIN": 1,
-        "NATR_MAX": 7,
+        "NATR_MAX": 9,
         "USE_DELTA_FILTER": true,
         "DELTA_MIN": -100,
-        "DELTA_MAX": 90,
+        "DELTA_MAX": 100,
         "USE_CORREL_FILTER": true,
         "CORREL_MIN": -100,
         "CORREL_MAX": 0.9,
@@ -37,19 +37,15 @@
       },
       "SELL": {
         "USE_NATR_FILTER": true,
-        "NATR_MIN": 1.5,
-        "NATR_MAX": 7,
+        "NATR_MIN": 1,
+        "NATR_MAX": 9,
         "USE_DELTA_FILTER": true,
         "DELTA_MIN": -100,
         "DELTA_MAX": 100,
         "USE_CORREL_FILTER": true,
         "CORREL_MIN": -100,
         "CORREL_MAX": 0.9,
-        "SKIP_DAYS": [
-          "monday",
-          "tuesday",
-          "wednesday"
-        ]
+        "SKIP_DAYS": []
       }
     }
   }
