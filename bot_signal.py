@@ -4,7 +4,8 @@ import time
 import math
 import tempfile
 import traceback
-from datetime import datetime, UTC
+from datetime import datetime, timezone, timedelta
+UTC = timezone.utc
 from threading import Thread, Lock
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
@@ -548,9 +549,14 @@ def send_message(text):
     if not CHAT_ID:
         print("⚠️ CHAT_ID не задан")
         return
+
     telegram_request(
         "sendMessage",
-        data={"chat_id": CHAT_ID, "text": text},
+        data={
+            "chat_id": CHAT_ID,
+            "text": text,
+            "parse_mode": "HTML",
+        },
     )
 
 
@@ -564,6 +570,7 @@ def send_signal_photo(path, caption):
                 data={
                     "chat_id": CHAT_ID,
                     "caption": caption,
+                    "parse_mode": "HTML",
                 },
                 files={"photo": photo},
                 timeout=30,
@@ -579,28 +586,27 @@ def signal_caption(res, tp, sl, corr):
     side_emoji = "🟢" if res["side"] == "BUY" else "🔴"
     side_word = "LONG" if res["side"] == "BUY" else "SHORT"
 
-    f_buy = STRAT_CFG["BUY"]
-    f_sell = STRAT_CFG["SELL"]
-    f = f_buy if res["side"] == "BUY" else f_sell
+    symbol = res["symbol"].replace("USDT", "")
+    tradingview_url = f"https://www.tradingview.com/chart/?symbol=BINANCE:{symbol}USDT.P"
 
-    skip_days = ", ".join(f.get("SKIP_DAYS", [])) or "—"
+    candle_dt = datetime.fromtimestamp(
+        res["candle_time"] / 1000,
+        UTC,
+    ) + timedelta(hours=3)
+
+    candle_time = candle_dt.strftime("%d.%m.%Y %H:%M UTC (+3)")
 
     return (
-        f"{side_emoji} <b>{side_word} SIGNAL</b>  ·  {BOT_NAME}\n"
+        f"{side_emoji} <b>{side_word} SIGNAL</b>\n"
         f"━━━━━━━━━━━━━━━━━━\n"
-        f"💎 <b>{res['symbol']}</b>   ·   1H   ·   {STRATEGY_NAME}\n\n"
-        f"💰 Entry: <b>{fmt_price(res['entry'])}</b>\n"
-        f"🎯 TP: <b>{fmt_price(tp)}</b>  (+{STRAT_CFG['tp']*100:.1f}%)\n"
-        f"🛡 SL: <b>{fmt_price(sl)}</b>  (-{STRAT_CFG['sl']*100:.1f}%)\n\n"
+        f"💎 <b>{res['symbol']}</b>   ·   1H\n"
+        f"💰 Entry: <b>{fmt_price(res['entry'])}</b>\n\n"
         f"📊 Volume: <b>x{res['vol_ratio']:.2f}</b>  ·  24h {fmt_volume(res['volume_24h'])} USDT\n"
         f"📐 Body: <b>{res['body_pct']:.1f}%</b>  ·  NATR: <b>{res['natr']:.3f}%</b>\n"
         f"⚡ Delta: <b>{res['delta_pct']:+.2f}%</b>  ·  BTC Corr: <b>{corr if corr is not None else 'N/A'}</b>\n"
-        f"📈 EMA{EMA_FAST}: {fmt_price(res['ema_fast'])}  ·  EMA{EMA_SLOW}: {fmt_price(res['ema_slow'])}\n"
-        f"🧠 Signal: <b>{', '.join(res['signals'])}</b>\n"
-        f"📅 Skip days: {skip_days}\n"
         f"━━━━━━━━━━━━━━━━━━\n"
-        f"⏱ Candle: {datetime.fromtimestamp(res['candle_time']/1000, UTC).strftime('%d.%m.%Y %H:%M UTC')}\n"
-        f"⚠️ Сигнал информационный. Ордер автоматически не открывается."
+        f"⏱️ Candle: {candle_time}\n\n"
+        f'📈 <a href="{tradingview_url}">TradingView</a>'
     )
 
 
@@ -643,8 +649,8 @@ def telegram_commands():
         try:
             r = requests.get(
                 f"https://api.telegram.org/bot{BOT_TOKEN}/getUpdates",
-                params={"offset": offset, "timeout": 25},
-                timeout=30,
+                params={"offset": offset, "timeout": 50},
+                timeout=60,
             )
             updates = r.json().get("result", [])
             for upd in updates:
